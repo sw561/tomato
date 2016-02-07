@@ -1,0 +1,122 @@
+Plan for tomato app code:
+
+Basic Features required:
+	- Toggle working or not using tmux key bind M-s
+	- Display time worked today
+	- Display time until next break / till end of break
+	- Plot time worked per day for last week, stored in a shelved list
+	- If last session is stale (final break was too long) start a new session
+	- If used on a new day update week:
+		- delete data from 8 days ago, save yesterday's data
+
+Shelve a dict with:
+	- datetime of last usage - use to check if need a new day is required. If a
+	  new day is required use add the old day to the week, and make a new day.
+	- day object with sessions throughout the day
+	- week object with "workdays": timedeltas and dates from last 7 days
+
+# HISTORICAL ANALYSIS
+class Week:
+	"""
+	Method to add a new day (this will call a method which removes any days
+	older than 1 week)
+	Method to plot a bar chart with last 7 days of work time - defaulting to
+	zero. Takes as optional:
+		argument the Day in progress. Then plots an "in progress" bar in a
+		different colour.
+	Contains objects of type WorkDay
+	Method which returns total time of last week, summing over workdays.
+	"""
+
+class WorkDay:
+	"""
+	Small objects containing a date and a timedelta for work time of that day
+	"""
+
+# LIVING IN THE PRESENT
+class Day:
+	"""
+	Has a date attribute
+	Container for sessions.
+	Method to return active (most recent) session. (After checking for
+	staleness)
+	Method to return total work time - just sum over sessions - This will use
+	the LENGTH of the sessions, not the time within the session during which
+	actual work was being done.
+	"""
+
+def tomato(timedelta session_length, timedelta break_so_far):
+	"""
+	Return amount more work until break is due
+	Algebra should be done using seconds!!!!
+	"""
+
+def potato(timedelta session_length, timedelta break_so_far):
+	"""
+	Return amount of break time allowed until need to start working
+	Algebra should be done using seconds!!!!
+	"""
+
+class Session:
+	"""
+	Method to return next important time for tmux statusbar. This works by
+	checking if working or not, and then calling either potato or tomato. And
+	then adding required work/allowed break to current time. Note that
+	important time can be both in the past or future.
+
+	Store on/off times of session so far.
+
+	Attribute with status (working or not).
+
+	Methods to return amount of time worked, and amount of time paused.
+
+	Method to return length of session so far. i.e. time until last break
+	started (if currently on a break)
+
+	If amount of required work is above some maximum, the session is stale.
+	Make a new session and add it the the current day. This will be called from
+	day. I.e. a call to day.get_session() may return a session in progress or a
+	brand new session if the last one was stale.
+	"""
+
+Use command line args and argparse, so only one executable.
+
+if run with --toggle:
+	This program is run when the toggle key is pressed, <M-p>. Print
+	statements are done using logging, so when run from the key binding,
+	without the verbose command, they will be ommitted. Use argparse for
+	verbose toggling.
+
+	Open the shelved data
+	If a new day, store the current day in week, and make a new day.
+
+	Get the latest session, and add the current time to the list of toggle
+	times. Toggle status attribute.
+
+	Call session.important_time method.
+
+	Write the ~~IMPORTANT TIME~~ and status to file for use by the tmux
+	script.
+
+run with --tmux:
+	Script to calculate string for tmux statusbar. Either "keep working for x",
+	or "have a break", or "enjoy your break for y" or "go back to work!".
+	With corresponding colour commands. This works by opening a small file with
+	the important time and status and comparing to current time.
+
+	Depending on another toggle keybinding can pause, and disable - such that
+	the tmux status bar is clean.
+	"""
+
+schematic plan of list of toggles:
+	ODD n toggles
+	7:
+
+	0	1	2	3	4	5	6
+		  b       b       b      = Working
+
+	EVEN n toggles
+	6:
+
+	0	1	2	3	4	5
+		  b       b              = Break time
