@@ -6,7 +6,7 @@ import shelve
 from datetime import *
 from time import sleep
 from session import *
-from plotter import plot_day
+from plotter import *
 from tomato import tmux_format, data_file_path, shelf_path
 
 def tmux_string():
@@ -16,11 +16,17 @@ def tmux_string():
 			(status, imp) = ("ON"==s[0]), datetime(*map(int, s[1:]))
 	except IOError:
 		logging.info("The data_file %s does was not found" % data_file_path())
-		exit()
+		return
 
 	now = datetime.now()
 	x = imp-now
-	print tmux_format(status, x)
+	# Only print if the session is recent
+	if status or x.days>=0 or (-x).seconds<60*60:
+		logging.info("Status, x: %d %s" % (status, str(x)))
+		print tmux_format(status, x)
+	else:
+		logging.info("Status, x: %d %s" % (status, str(x)))
+		logging.info("The session is old - not printing")
 
 def main(args):
 	if args.tmux:
@@ -31,25 +37,23 @@ def main(args):
 		return
 
 	d = shelve.open(shelf_path())
-
 	today = datetime.now().date()
-
-	# If the shelf already has a current day object, retrieve it
-	day_stale = True
-	if d.has_key("day") and d["day"].date==today:
-		day_stale = False
-		day = d["day"]
-		logging.info("Retrieving day %s with %d sessions" \
-			% (day.date, len(day.sessions)))
+	day = d.get("day", Day(today))
+	week = d.get("week", Week())
 
 	if args.report:
-		if not day_stale:
+		if day.date==today:
+			day.log()
 			plot_day(day)
 		else:
-			logging.info("No active day - quitting")
+			logging.info("No active day to plot")
+		week.log()
+		plot_week(week)
 
 	if args.toggle:
-		if day_stale:
+		if day.date!=today:
+			# Replace the day if it is stale, add old day to week
+			week.add_day(WorkDay(day))
 			day = Day(today)
 			logging.info("Making a new day %s" % day.date)
 
@@ -57,8 +61,9 @@ def main(args):
 		session.toggle()
 		session.log()
 
-		# Reshelve the day
+		# Reshelve the day and week
 		d["day"] = day
+		d["week"] = week
 
 		# Write the important time and status to file
 		# This is the information which is needed by the tmux_string function
@@ -69,8 +74,7 @@ def main(args):
 			(status, imp) = session.important_time()
 			if status: st="ON"
 			else: st="OFF"
-			s =  st + imp.strftime(" %Y %m %d %H %M %S")
-			f.write("%s\n" % s)
+			f.write("%s" % st + imp.strftime(" %Y %m %d %H %M %S") + "\n")
 
 	d.close()
 
@@ -91,7 +95,7 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 	group.add_argument("-r", "--report", action="store_true",
 	                   help="Create plots which report on recent work patterns"
 	                   )
-	group.add_argument("--tmux", action="store_true",
+	group.add_argument("-x", "--tmux", action="store_true",
 	                   help="Output string for use in tmux status bar"
 	                   )
 	args = parser.parse_args()

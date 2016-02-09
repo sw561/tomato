@@ -2,10 +2,48 @@ from datetime import *
 from tomato import tomato, potato, max_work
 import logging
 
+class Week(object):
+	def __init__(self):
+		self.days = [None]*7
+
+	def log(self):
+		logging.info("Printing a week")
+		for i in self.days:
+			if i is not None:
+				logging.info("%s %d/%d %.2f" \
+					% (i.date.strftime("%a"), i.date.month, i.date.day,
+						i.work_time.seconds/(60*60.)
+						)
+					)
+		logging.info("Finished printing a week")
+
+	def add_day(self, workday):
+		slot = workday.date.weekday()
+		self.days[slot] = workday
+		logging.info("Adding workday from %d/%d in slot %d" \
+			% (workday.date.month, workday.date.day, workday.date.weekday())
+			)
+
+	def total_time(self):
+		return sum([x.work_time for x in self.days if x is not None],
+			timedelta())
+
+class WorkDay(object):
+	"""
+	A minimalist day - just the date and total work time, for use in Week
+	"""
+	def __init__(self, day):
+		self.date = day.date
+		self.work_time = day.total_time()
+
 class Day(object):
 	def __init__(self, date):
 		self.date = date
 		self.sessions = []
+
+	def log(self):
+		for s in self.sessions:
+			s.log()
 
 	def get_session(self):
 		if not self.sessions or self.sessions[-1].stale():
