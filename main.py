@@ -40,20 +40,28 @@ def main(args):
 	today = datetime.now().date()
 	day = d.get("day", Day(today))
 	week = d.get("week", Week())
+	year = d.get("year", Year())
 
 	if args.report:
-		if day.date==today:
-			day.log()
-			plot_day(day)
-		else:
-			logging.info("No active day to plot")
+		day.log()
 		week.log()
-		plot_week(week)
+		plot(day, week)
+		if args.year:
+			year.log()
+			plot_year(year)
 
 	if args.toggle:
 		if day.date!=today:
 			# Replace the day if it is stale, add old day to week
-			week.add_day(WorkDay(day))
+			wd = WorkDay(day)
+			week.add_day(wd)
+			d["week"] = week
+
+			if year.year!=today.year:
+				year = Year()
+			year.add_day(wd)
+			d["year"] = year
+
 			day = Day(today)
 			logging.info("Making a new day %s" % day.date)
 
@@ -61,9 +69,7 @@ def main(args):
 		session.toggle()
 		session.log()
 
-		# Reshelve the day and week
 		d["day"] = day
-		d["week"] = week
 
 		# Write the important time and status to file
 		# This is the information which is needed by the tmux_string function
@@ -97,6 +103,9 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 	                   )
 	group.add_argument("-x", "--tmux", action="store_true",
 	                   help="Output string for use in tmux status bar"
+	                   )
+	parser.add_argument("-y", "--year", action="store_true",
+	                   help="If using report option, plot the year too"
 	                   )
 	args = parser.parse_args()
 	if args.verbose:

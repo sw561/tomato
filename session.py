@@ -2,6 +2,20 @@ from datetime import *
 from tomato import tomato, potato, max_work
 import logging
 
+class Year(object):
+	def __init__(self):
+		self.weeks = [0]*54
+		self.year = datetime.now().year
+
+	def log(self):
+		logging.info("Printing a year")
+		for i,w in enumerate(self.weeks):
+			logging.info("Week %d: %.2f" % (i, w))
+
+	def add_day(self, workday):
+		week = int(workday.date.strftime("%W"))
+		self.weeks[week] += workday.work_time.seconds/(60.*60)
+
 class Week(object):
 	def __init__(self):
 		self.days = [None]*7
@@ -21,8 +35,19 @@ class Week(object):
 		slot = workday.date.weekday()
 		self.days[slot] = workday
 		logging.info("Adding workday from %d/%d in slot %d" \
-			% (workday.date.month, workday.date.day, workday.date.weekday())
+			% (workday.date.month, workday.date.day, slot)
 			)
+
+	def clean(self):
+		"""Remove days that are older than a week"""
+		logging.info("Checking week for old days")
+		today = datetime.now().date()
+		for i,d in enumerate(self.days):
+			if d is not None and today-d.date > timedelta(7):
+				self.days[i] = None
+				logging.info("Deleting old workday from %d/%d in slot %d" \
+					% (d.date.month, d.date.day, i)
+					)
 
 	def total_time(self):
 		return sum([x.work_time for x in self.days if x is not None],

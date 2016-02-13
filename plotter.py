@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from numpy import arange
 import logging
 
-def plot_day(day):
+def plot(day, week):
 	"""Plot sessions of the day"""
 
 	starts = []
@@ -17,35 +17,29 @@ def plot_day(day):
 	logging.info("Durations are %s" % str(widths))
 
 	fig = plt.figure()
-	fig.set_size_inches(6,3)
-	fig.subplots_adjust(top=0.85,bottom=0.2,left=0.02,
-		right=0.99)
+	fig.set_size_inches(6,7)
+	fig.subplots_adjust(top=0.95,bottom=0.05,left=0.1,
+		right=0.95, hspace=0.3)
 
+	plt.subplot(2,1,1)
 	plt.bar(starts, [1 for i in starts], width=widths)
-
-	ax = plt.subplot(1,1,1)
 
 	plt.yticks([])
 	plt.ylim([-1,2])
-	plt.xlim([9, starts[-1]+widths[-1]])
+	plt.xlim([min(9, starts[0]), max(18, starts[-1]+widths[-1])])
 	plt.xlabel("Hour of the day")
+	plt.title("%s: %.1f hours" \
+		% (day.date.strftime("%A"), day.total_time().seconds/(60.*60))
+		)
 
-	plt.title("Total time: %.1f hours" % (day.total_time().seconds/(60.*60)))
-
-	plt.savefig("day.png")
-	plt.clf()
-
-def plot_week(week):
+	# Prepare to plot by cleaning out old days
+	week.clean()
 	logging.info("Plotting the week")
-
-	fig = plt.figure()
-	fig.set_size_inches(6,4)
-	fig.subplots_adjust(top=0.85,bottom=0.2,left=0.1,
-		right=0.99)
 
 	heights = [(i.work_time.seconds/(60.*60)) if i is not None else 0 \
 		for i in week.days]
 
+	plt.subplot(2,1,2)
 	plt.bar(range(7), heights, width=1)
 
 	plt.xlim([0,7])
@@ -53,8 +47,21 @@ def plot_week(week):
 		[i.date.strftime("%a") if i is not None else "" for i in week.days]
 		)
 	plt.ylabel("Hours")
+	plt.title("Week total: %.1f hours" % (week.total_time().seconds/(60.*60)))
 
-	plt.title("Total time: %.1f" % (week.total_time().seconds/(60.*60)))
+	plt.savefig("report.png")
+	plt.clf()
 
-	plt.savefig("week.png")
+def plot_year(year):
+	"""Plot progress through the year"""
+
+	fig = plt.figure()
+
+	plt.bar(range(len(year.weeks)), year.weeks, width=1)
+
+	plt.xlim([0,len(year.weeks)+1])
+	plt.xlabel("Week")
+	plt.ylabel("Hours")
+
+	plt.savefig("year.png")
 	plt.clf()
