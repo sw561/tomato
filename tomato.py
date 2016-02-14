@@ -89,10 +89,10 @@ def get_home():
 	return os.path.expanduser("~")
 
 def data_file_path():
-	return get_home()+"/tomato/status.txt"
+	return get_home()+"/Dropbox/status.txt"
 
 def shelf_path():
-	return get_home()+"/tomato/tomato.db"
+	return get_home()+"/Dropbox/tomato.db"
 
 if __name__=="__main__":
 	print "File paths"
