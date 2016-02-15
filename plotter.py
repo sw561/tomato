@@ -48,7 +48,11 @@ def plot(day, week):
 		[i.date.strftime("%a") if i is not None else "" for i in week.days]
 		)
 	plt.ylabel("Hours")
-	plt.title("Week total: %.1f hours" % (week.total_time().seconds/(60.*60)))
+
+	# Need to convert total time to hours (may be over one day)
+	total = week.total_time()
+	hours = total.days*24 + total.seconds/(60.*60)
+	plt.title("Week total: %.1f hours" % hours)
 
 	plt.savefig(get_home()+"/tomato/report.png")
 	plt.clf()
