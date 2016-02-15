@@ -1,3 +1,4 @@
+from tomato import get_home
 import matplotlib.pyplot as plt
 from numpy import arange
 import logging
@@ -49,7 +50,7 @@ def plot(day, week):
 	plt.ylabel("Hours")
 	plt.title("Week total: %.1f hours" % (week.total_time().seconds/(60.*60)))
 
-	plt.savefig("report.png")
+	plt.savefig(get_home()+"/tomato/report.png")
 	plt.clf()
 
 def plot_year(year):
@@ -63,5 +64,5 @@ def plot_year(year):
 	plt.xlabel("Week")
 	plt.ylabel("Hours")
 
-	plt.savefig("year.png")
+	plt.savefig(get_home()+"/tomato/year.png")
 	plt.clf()
