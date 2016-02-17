@@ -92,7 +92,7 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 """
 		)
 	parser.add_argument("-v", "--verbose", action="store_true",
-						help="verbose output for debugging"
+	                    help="verbose output for debugging"
 	                   )
 	group = parser.add_mutually_exclusive_group()
 	group.add_argument("-t", "--toggle", action="store_true",
