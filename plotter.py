@@ -27,14 +27,15 @@ def plot(day, week):
 
 	plt.yticks([])
 	plt.ylim([-1,2])
-	plt.xlim([min(9, starts[0]), max(18, starts[-1]+widths[-1])])
+	if starts:
+		plt.xlim([min(9, starts[0]), max(18, starts[-1]+widths[-1])])
+	else:
+		plt.xlim([9, 18])
 	plt.xlabel("Hour of the day")
 	plt.title("%s: %.1f hours" \
 		% (day.date.strftime("%A"), day.total_time().seconds/(60.*60))
 		)
 
-	# Prepare to plot by cleaning out old days
-	week.clean()
 	logging.info("Plotting the week")
 
 	heights = [(i.work_time.seconds/(60.*60)) if i is not None else 0 \

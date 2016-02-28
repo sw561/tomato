@@ -42,6 +42,22 @@ def main(args):
 	week = d.get("week", Week())
 	year = d.get("year", Year())
 
+	if day.date!=today:
+		# Replace the day if it is stale, add old day to week
+		wd = WorkDay(day)
+		week.clean()
+		week.add_day(wd)
+		d["week"] = week
+
+		if year.year!=today.year:
+			year = Year()
+		year.add_day(wd)
+		d["year"] = year
+
+		day = Day(today)
+		d["day"] = day
+		logging.info("Making a new day %s" % day.date)
+
 	if args.report:
 		day.log()
 		week.log()
@@ -51,20 +67,6 @@ def main(args):
 			plot_year(year)
 
 	if args.toggle:
-		if day.date!=today:
-			# Replace the day if it is stale, add old day to week
-			wd = WorkDay(day)
-			week.add_day(wd)
-			d["week"] = week
-
-			if year.year!=today.year:
-				year = Year()
-			year.add_day(wd)
-			d["year"] = year
-
-			day = Day(today)
-			logging.info("Making a new day %s" % day.date)
-
 		session = day.get_session()
 		session.toggle()
 		session.log()
