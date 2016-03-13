@@ -21,7 +21,7 @@ def tmux_string():
 	now = datetime.now()
 	x = imp-now
 	# Only print if the session is recent
-	if status or x.days>=0 or (-x).seconds<60*60:
+	if status or x>timedelta(0, -60*60):
 		logging.info("Status, x: %d %s" % (status, str(x)))
 		print tmux_format(status, x)
 	else:
