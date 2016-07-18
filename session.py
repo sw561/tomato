@@ -2,20 +2,6 @@ from datetime import *
 from tomato import tomato, potato, max_work
 import logging
 
-class Year(object):
-	def __init__(self):
-		self.weeks = [0]*54
-		self.year = datetime.now().year
-
-	def log(self):
-		logging.info("Printing a year")
-		for i,w in enumerate(self.weeks):
-			logging.info("Week %d: %.2f" % (i, w))
-
-	def add_day(self, workday):
-		week = int(workday.date.strftime("%W"))
-		self.weeks[week] += workday.work_time.seconds/(60.*60)
-
 class Week(object):
 	def __init__(self):
 		self.days = [None]*7
@@ -70,15 +56,34 @@ class Day(object):
 		for s in self.sessions:
 			s.log()
 
-	def get_session(self):
-		if not self.sessions or self.sessions[-1].stale():
-			logging.info("Creating a new session")
-			self.sessions.append(Session())
-		else:
-			logging.info("Returning a session which started: %s"\
-				% str(self.sessions[-1].toggles[0])
-				)
+	def new_session(self):
+		logging.info("Creating a new session")
+		self.sessions.append(Session())
 		return self.sessions[-1]
+
+	def last_session(self):
+		logging.info("Returning a session which started: %s"\
+			% str(self.sessions[-1].toggles[0])
+			)
+		return self.sessions[-1]
+
+	def get_session(self, interactive=False):
+		if not self.sessions:
+			return self.new_session()
+
+		elif self.sessions[-1].stale():
+			if not interactive:
+				return self.new_session()
+			else:
+				print "Session is stale"
+				print "Do you want to create a new session?"
+				if yes_no_question():
+					return self.new_session()
+				else:
+					return self.last_session()
+
+		else:
+			return self.last_session()
 
 	def total_time(self):
 		return sum([x.duration() for x in self.sessions], timedelta())
@@ -89,18 +94,31 @@ class Session(object):
 
 	def log(self):
 		logging.info("Printing a session")
-		for i in self.toggles:
-			logging.info("%s" % str(i))
+		on = True
+		for (n,i) in enumerate(self.toggles):
+			logging.info("#%d: %s" % (n,str(i)))
+			if on:
+				logging.info("\tWORK")
+			else:
+				logging.info("\tBREAK")
+			on = not on
 		logging.info("Finished printing a session")
 
 	def status(self):
 		# Odd number of toggles means working
 		return len(self.toggles)%2
 
-	def toggle(self):
-		t = datetime.now()
+	def toggle(self, t=None):
+		if t is None:
+			t = datetime.now()
+			should_sort = False
+		else:
+			should_sort = True
 		logging.info("Adding a toggle at time %s" % str(t))
 		self.toggles.append(t)
+
+		if should_sort:
+			self.toggles.sort()
 
 	def important_time(self):
 		"""
@@ -161,3 +179,14 @@ class Session(object):
 	def length(self):
 		"""Just the time since the session was started"""
 		return datetime.now() - self.toggles[0]
+
+def yes_no_question():
+	while True:
+		print(" [y/n] ")
+		text = raw_input()
+		if text.lower().startswith("y"):
+			return True
+		elif text.lower().startswith("n"):
+			return False
+		else:
+			print("Sorry, I didn't understand that. Please type yes or no.")

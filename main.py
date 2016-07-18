@@ -28,63 +28,61 @@ def tmux_string():
 		logging.info("Status, x: %d %s" % (status, str(x)))
 		logging.info("The session is old - not printing")
 
-def main(args):
-	if args.tmux:
-		# Sleep a while, so the toggle operation has a chance to complete
-		if not args.verbose:
-			sleep(0.5)
-		tmux_string()
-		return
+def write_data(session):
+	# Write the important time and status to file
+	# This is the information which is needed by the tmux_string function
+	with open(data_file_path(), "w") as f:
+		# This is a string "ON" or otherwise, and a space separated list of
+		# integers representing the date: year, month, day, hour, minute,
+		# second
+		(status, imp) = session.important_time()
+		if status: st="ON"
+		else: st="OFF"
+		f.write("%s" % st + imp.strftime(" %Y %m %d %H %M %S") + "\n")
 
+def unshelve():
 	d = shelve.open(shelf_path())
 	today = datetime.now().date()
 	day = d.get("day", Day(today))
 	week = d.get("week", Week())
-	year = d.get("year", Year())
 
 	if day.date!=today:
-		# Replace the day if it is stale, add old day to week
-		wd = WorkDay(day)
+		# Save data from old day in week object
 		week.clean()
-		week.add_day(wd)
+		week.add_day(WorkDay(day))
 		d["week"] = week
 
-		if year.year!=today.year:
-			year = Year()
-		year.add_day(wd)
-		d["year"] = year
-
-		day = Day(today)
-		d["day"] = day
+		# Make a new day instance
 		logging.info("Making a new day %s" % day.date)
-
-	if args.report:
-		day.log()
-		week.log()
-		plot(day, week)
-		if args.year:
-			year.log()
-			plot_year(year)
-
-	if args.toggle:
-		session = day.get_session()
-		session.toggle()
-		session.log()
-
-		d["day"] = day
-
-		# Write the important time and status to file
-		# This is the information which is needed by the tmux_string function
-		with open(data_file_path(), "w") as f:
-			# This is a string "ON" or otherwise, and a space separated list of
-			# integers representing the date: year, month, day, hour, minute,
-			# second
-			(status, imp) = session.important_time()
-			if status: st="ON"
-			else: st="OFF"
-			f.write("%s" % st + imp.strftime(" %Y %m %d %H %M %S") + "\n")
+		day = Day()
 
 	d.close()
+	return day,week
+
+def reshelve(day, week):
+	d = shelve.open(shelf_path())
+	d["week"] = week
+	d["day"] = day
+	d.close()
+
+def use_shelf(g):
+	# A decorator for functions that unshelve and reshelve
+	def f():
+		day,week = unshelve()
+		g(day, week)
+		reshelve(day, week)
+	return f
+
+@use_shelf
+def toggle(day, week):
+	session = day.get_session()
+	session.toggle()
+	session.log()
+	write_data(session)
+
+@use_shelf
+def report(day, week):
+	plot(day, week)
 
 if __name__=="__main__":
 	parser = argparse.ArgumentParser(
@@ -95,19 +93,16 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 		)
 	parser.add_argument("-v", "--verbose", action="store_true",
 	                    help="verbose output for debugging"
-	                   )
+	                    )
 	group = parser.add_mutually_exclusive_group()
 	group.add_argument("-t", "--toggle", action="store_true",
 	                   help="Toggle the working status of the app"
 	                   )
 	group.add_argument("-r", "--report", action="store_true",
-	                   help="Create plots which report on recent work patterns"
+	                   help="Create plot which report on recent work patterns"
 	                   )
 	group.add_argument("-x", "--tmux", action="store_true",
 	                   help="Output string for use in tmux status bar"
-	                   )
-	parser.add_argument("-y", "--year", action="store_true",
-	                   help="If using report option, plot the year too"
 	                   )
 	args = parser.parse_args()
 	if args.verbose:
@@ -117,4 +112,14 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 			datefmt="%-H:%M:%S"
 		)
 
-	main(args)
+	if args.tmux:
+		# Sleep a while, so the toggle operation has a chance to complete
+		if not args.verbose:
+			sleep(0.5)
+		tmux_string()
+
+	elif args.toggle:
+		toggle()
+
+	elif args.report:
+		report()

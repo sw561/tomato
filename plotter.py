@@ -57,17 +57,3 @@ def plot(day, week):
 
 	plt.savefig(get_home()+"/tomato/report.png")
 	plt.clf()
-
-def plot_year(year):
-	"""Plot progress through the year"""
-
-	fig = plt.figure()
-
-	plt.bar(range(len(year.weeks)), year.weeks, width=1)
-
-	plt.xlim([0,len(year.weeks)+1])
-	plt.xlabel("Week")
-	plt.ylabel("Hours")
-
-	plt.savefig(get_home()+"/tomato/year.png")
-	plt.clf()

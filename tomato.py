@@ -25,8 +25,8 @@ def ratio():
 
 def offset():
 	"""
-	If you like to do add extra minutes to the first pomodoro of your session,
-	do so by setting a non-zero offset.
+	If you like to add extra minutes to the first pomodoro of your session, do
+	so by setting a non-zero offset.
 	"""
 	return ratio()*break_length()
 
