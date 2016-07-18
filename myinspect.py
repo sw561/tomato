@@ -34,8 +34,8 @@ def save():
 	write_data(session)
 
 def prompt():
-	print "To add a toggle use add_toggle(hour, minute)"
-	print "To remove a toggle us remove(n), as indicated by #"
+	print "To add a toggle use toggle(hour, minute)"
+	print "To remove a toggle use remove(n), as indicated by #"
 	print "To save the toggles use save()"
 
 def show():
