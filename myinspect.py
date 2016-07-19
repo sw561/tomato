@@ -6,7 +6,7 @@ from main import unshelve,reshelve,write_data
 from datetime import *
 import os
 from renumber import renumber
-from tomato import plan_path
+from tomato import plan_path,data_file_path
 from yesno import yes_no_question
 
 # Implement a rudimentary interpretor
@@ -44,11 +44,15 @@ def save():
 	reshelve(day, week)
 	write_data(session)
 
+def quiet():
+	os.remove(data_file_path())
+
 def show():
 	session.log()
 	print ""
 	print "To add a toggle use toggle(hour, minute)"
 	print "To remove a toggle use remove(n), as indicated by #"
+	print "To temporarily remove the message in tmux, use quiet()"
 	print "To save the toggles use save()"
 	print ""
 	print "To display the plan use plan()"
