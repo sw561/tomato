@@ -21,11 +21,10 @@ def tmux_string():
 	now = datetime.now()
 	x = imp-now
 	# Only print if the session is recent
+	logging.info("Status, x: %d %s" % (status, str(x)))
 	if status or x>timedelta(0, -60*60):
-		logging.info("Status, x: %d %s" % (status, str(x)))
 		print tmux_format(status, x)
 	else:
-		logging.info("Status, x: %d %s" % (status, str(x)))
 		logging.info("The session is old - not printing")
 
 def write_data(session):
