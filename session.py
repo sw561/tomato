@@ -68,7 +68,7 @@ class Day(object):
 			)
 		return self.sessions[-1]
 
-	def get_session(self, interactive=False):
+	def get_session(self, interactive=True):
 		if not self.sessions:
 			return self.new_session()
 

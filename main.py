@@ -75,7 +75,7 @@ def use_shelf(g):
 
 @use_shelf
 def toggle(day, week):
-	session = day.get_session()
+	session = day.get_session(interactive=False)
 	session.toggle()
 	session.log()
 	write_data(session)

@@ -18,7 +18,7 @@ logging.basicConfig(
 )
 
 day, week = unshelve()
-session = day.get_session(interactive=True)
+session = day.get_session()
 
 def toggle(hour=None, minute=0):
 	if hour is None:
