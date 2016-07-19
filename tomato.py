@@ -94,6 +94,9 @@ def data_file_path():
 def shelf_path():
 	return get_home()+"/Dropbox/tomato.db"
 
+def plan_path():
+	return get_home()+"/Dropbox/plan.txt"
+
 if __name__=="__main__":
 	print "File paths"
 	print data_file_path()

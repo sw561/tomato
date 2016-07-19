@@ -54,7 +54,7 @@ def unshelve():
 
 		# Make a new day instance
 		logging.info("Making a new day %s" % day.date)
-		day = Day()
+		day = Day(today)
 
 	d.close()
 	return day,week

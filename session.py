@@ -1,6 +1,7 @@
 from datetime import *
 from tomato import tomato, potato, max_work
 import logging
+from yesno import yes_no_question
 
 class Week(object):
 	def __init__(self):
@@ -179,14 +180,3 @@ class Session(object):
 	def length(self):
 		"""Just the time since the session was started"""
 		return datetime.now() - self.toggles[0]
-
-def yes_no_question():
-	while True:
-		print(" [y/n] ")
-		text = raw_input()
-		if text.lower().startswith("y"):
-			return True
-		elif text.lower().startswith("n"):
-			return False
-		else:
-			print("Sorry, I didn't understand that. Please type yes or no.")
