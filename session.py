@@ -103,6 +103,7 @@ class Session(object):
 			else:
 				logging.info("\tBREAK")
 			on = not on
+		logging.info("Imp Time: %s" % str(self.important_time()))
 		logging.info("Finished printing a session")
 
 	def status(self):
@@ -119,7 +120,11 @@ class Session(object):
 		self.toggles.append(t)
 
 		if should_sort:
-			self.toggles.sort()
+			# Insertion sort for the new toggle to keep the list sorted
+			t = self.toggles
+			for n in xrange(len(t)-1,0,-1):
+				if t[n]>t[n-1]: break
+				t[n], t[n-1] = t[n-1], t[n]
 
 	def important_time(self):
 		"""
@@ -137,8 +142,7 @@ class Session(object):
 			remaining_time_s = potato(work_s, break_s)
 
 		imp_time = datetime.now() + timedelta(0, remaining_time_s)
-
-		return (self.status(), imp_time)
+		return imp_time
 
 	def stale(self):
 		if self.status():

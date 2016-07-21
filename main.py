@@ -34,7 +34,8 @@ def write_data(session):
 		# This is a string "ON" or otherwise, and a space separated list of
 		# integers representing the date: year, month, day, hour, minute,
 		# second
-		(status, imp) = session.important_time()
+		status = session.status()
+		imp = session.important_time()
 		if status: st="ON"
 		else: st="OFF"
 		f.write("%s" % st + imp.strftime(" %Y %m %d %H %M %S") + "\n")
@@ -79,10 +80,6 @@ def toggle(day, week):
 	session.log()
 	write_data(session)
 
-@use_shelf
-def report(day, week):
-	plot(day, week)
-
 if __name__=="__main__":
 	parser = argparse.ArgumentParser(
 		description=
@@ -98,7 +95,7 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 	                   help="Toggle the working status of the app"
 	                   )
 	group.add_argument("-r", "--report", action="store_true",
-	                   help="Create plot which report on recent work patterns"
+	                   help="Create plot which reports on recent work patterns"
 	                   )
 	group.add_argument("-x", "--tmux", action="store_true",
 	                   help="Output string for use in tmux status bar"
@@ -121,4 +118,5 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 		toggle()
 
 	elif args.report:
-		report()
+		day,week = unshelve()
+		plot(day, week)
