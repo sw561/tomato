@@ -63,13 +63,13 @@ def help():
 	print "To display the plan use plan()"
 
 def plan():
+	renumber(plan_path())
 	with open(plan_path(),"r") as f:
 		for line in f: print line.strip()
 	print "\nTo edit the plan use edit_plan()"
 
 def edit_plan():
 	os.system("vim %s" % plan_path())
-	renumber(plan_path())
 	plan()
 
 print ""

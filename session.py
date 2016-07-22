@@ -63,10 +63,14 @@ class Day(object):
 		return self.sessions[-1]
 
 	def last_session(self):
-		logging.info("Returning a session which started: %s"\
-			% str(self.sessions[-1].toggles[0])
-			)
-		return self.sessions[-1]
+		s = self.sessions[-1]
+		if not s.toggles:
+			logging.info("Returning an empty session")
+		else:
+			logging.info("Returning a session which started: %s"\
+				% str(s.toggles[0])
+				)
+		return s
 
 	def get_session(self, interactive=True):
 		if not self.sessions:
@@ -103,7 +107,9 @@ class Session(object):
 			else:
 				logging.info("\tBREAK")
 			on = not on
-		logging.info("Imp Time: %s" % str(self.important_time()))
+		# Only print important time if there is at least one toggle
+		if self.toggles:
+			logging.info("Imp Time: %s" % str(self.important_time()))
 		logging.info("Finished printing a session")
 
 	def status(self):
@@ -145,6 +151,8 @@ class Session(object):
 		return imp_time
 
 	def stale(self):
+		if not self.toggles:
+			return False
 		if self.status():
 			# If currently working, then the session is not stale
 			s = False

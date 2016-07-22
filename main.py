@@ -28,6 +28,8 @@ def tmux_string():
 		logging.info("The session is old - not printing")
 
 def write_data(session):
+	if not session.toggles:
+		return
 	# Write the important time and status to file
 	# This is the information which is needed by the tmux_string function
 	with open(data_file_path(), "w") as f:
