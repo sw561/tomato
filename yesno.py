@@ -1,7 +1,13 @@
-def yes_no_question(question):
-	print("%s ([y]/n)" % question)
+def yes_no_question(question, default=True):
+	if default:
+		suggest = "([y]/n)"
+	else:
+		suggest = "(y/[n])"
+	print("%s %s" % (question,suggest))
 	text = raw_input()
 	if text.lower().startswith("n"):
 		return False
-	else:
+	elif text.lower().startswith("y"):
 		return True
+	else:
+		return default
