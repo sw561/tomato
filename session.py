@@ -81,8 +81,7 @@ class Day(object):
 				return self.new_session()
 			else:
 				print "Session is stale"
-				print "Do you want to create a new session?"
-				if yes_no_question():
+				if yes_no_question("Do you want to create a new session?"):
 					return self.new_session()
 				else:
 					return self.last_session()

@@ -47,8 +47,7 @@ def show(changed=False):
 	if save_required:
 		print "The session is unsaved - use save()"
 	elif changed:
-		print "Do you want to save the changes?"
-		if yes_no_question():
+		if yes_no_question("Do you want to save the changes?"):
 			save()
 		else:
 			save_required = True
