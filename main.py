@@ -50,8 +50,8 @@ def unshelve():
 
 	if day.date!=today:
 		# Save data from old day in week object
-		week.clean()
 		week.add_day(WorkDay(day))
+		week.clean()
 		d["week"] = week
 
 		# Make a new day instance
