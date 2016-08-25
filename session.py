@@ -187,6 +187,8 @@ class Session(object):
 			return self.length()
 		else:
 			# Otherwise return time until last bit of work
+			# Check that this isn't an empty session
+			if not self.toggles: return timedelta()
 			return self.toggles[-1] - self.toggles[0]
 
 	def length(self):

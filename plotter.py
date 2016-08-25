@@ -10,8 +10,16 @@ def plot(day, week):
 	widths = []
 	for s in day.sessions:
 		# Convert session starts, and durations to hours
-		starts.append(s.toggles[0].hour + s.toggles[0].minute/60.)
-		widths.append(s.duration().seconds/(60.*60))
+		try:
+			start = s.toggles[0].hour + s.toggles[0].minute/60.
+			width = s.duration().seconds/(60.*60)
+		except IndexError:
+			pass
+		else:
+			# Append in else clause to ensure the lists remain the same length
+			# as each other
+			starts.append(start)
+			widths.append(width)
 
 	logging.info("Plotting the day")
 	logging.info("Starts are %s" % str(starts))
