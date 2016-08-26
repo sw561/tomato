@@ -48,7 +48,7 @@ def unshelve():
 	day = d.get("day", Day(today))
 	week = d.get("week", Week())
 
-	if day.date!=today:
+	if day.date!=today and not day.last_session().status():
 		# Save data from old day in week object
 		week.add_day(WorkDay(day))
 		week.clean()
