@@ -4,7 +4,7 @@ def yes_no_question(question, default=True):
 	else:
 		suggest = "(y/[n])"
 	print("%s %s" % (question,suggest))
-	text = raw_input()
+	text = raw_input().strip()
 	if text.lower().startswith("n"):
 		return False
 	elif text.lower().startswith("y"):

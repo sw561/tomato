@@ -122,3 +122,7 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 	elif args.report:
 		day,week = unshelve()
 		plot(day, week)
+
+	else:
+		print "Doing nothing..."
+		print "Run './main.py --help' for help with options"
