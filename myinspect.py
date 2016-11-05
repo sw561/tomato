@@ -32,6 +32,11 @@ def remove(n):
 	session.toggles.pop(n)
 	show(changed=True)
 
+def new_session():
+	global session
+	session = day.new_session()
+	show(changed=True)
+
 def save():
 	reshelve(day, week)
 	write_data(session)
@@ -56,6 +61,7 @@ def help():
 	print "To view the toggles of the session call show()"
 	print "To add a toggle use toggle(hour, minute=0)"
 	print "To remove a toggle use remove(n), where n is indicated by #"
+	print "To make a new session use new_session()"
 	print ("To temporarily remove the message in tmux, use quiet(). "
 		"(To reinstate just toggle)")
 	print "To save the toggles use save()"
