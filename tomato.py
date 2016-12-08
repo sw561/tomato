@@ -54,22 +54,22 @@ def tmux_format(working, x):
 	working is a boolean, x is timedelta until important time
 	"""
 	if working and x.days>=0:
-		message = "Keep working"
+		message = "KW"
 		fg = "colour4"
 		bg = "white"
 
 	elif working and x.days<0:
-		message = "Have a break"
+		message = "HB"
 		fg = "colour11"
 		bg = "black"
 
 	elif not working and x.days>=0:
-		message = "Enjoy your break"
+		message = "EB"
 		fg = "colour10"
 		bg = "black"
 
 	elif not working and x.days<0:
-		message = "Go back to work"
+		message = "GW"
 		fg = "colour1"
 		bg = "white"
 
@@ -83,6 +83,25 @@ def tmux_format(working, x):
 			s += ": %d mins" % n
 
 	return s+"  "
+
+def max_lag():
+	""" Max seconds of lag in log file update """
+	return 60
+
+def tmux_format_monitor(log_status, log_name):
+	message = log_name
+	if log_status:
+		fg = "colour4"
+		bg = "white"
+		reverse = "reverse"
+		message += "  "
+	else:
+		message += " |"
+		fg = "white"
+		bg = "default"
+		reverse = "noreverse"
+	s = "#[%s,fg=%s,bg=%s]  %s" % (reverse, fg, bg, message)
+	return s
 
 def get_home():
 	"""Return home directory for the current computer"""
