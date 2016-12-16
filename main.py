@@ -70,12 +70,8 @@ def use_shelf_log_folder(g):
 
 def set_log_folder(log_folder):
 	day,week,log_folder_old = unshelve()
-	if log_folder=="0":
-		logging.info("Setting log_folder to None")
-		reshelve(day, week, None)
-	else:
-		logging.info("Storing log_folder %s" % log_folder)
-		reshelve(day, week, log_folder)
+	logging.info("Storing log_folder %s" % log_folder)
+	reshelve(day, week, log_folder)
 
 @use_shelf
 def toggle(day, week):
@@ -116,7 +112,11 @@ def tmux_string(log_folder):
 			max_time = max_lag()
 			logging.info("Max lag is %s" % str(max_time))
 			log_status = lag_time.total_seconds() < max_time
-			log_name = log_folder.split("/")[-2]
+			# Get log_name to put in tmux status line
+			if log_folder[-1]=="/":
+				log_name = log_folder.split("/")[-2]
+			else:
+				log_name = log_folder.split("/")[-1]
 			logging.info("Log name is %s" % log_name)
 			return_val += tmux_format_monitor(log_status, log_name)
 	else:

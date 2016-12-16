@@ -86,7 +86,7 @@ def tmux_format(working, x):
 
 def max_lag():
 	""" Max seconds of lag in log file update """
-	return 60
+	return 180
 
 def tmux_format_monitor(log_status, log_name):
 	message = log_name
