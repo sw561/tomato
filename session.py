@@ -63,6 +63,9 @@ class Day(object):
 		return self.sessions[-1]
 
 	def last_session(self):
+		if not self.sessions:
+			return self.new_session()
+
 		s = self.sessions[-1]
 		if not s.toggles:
 			logging.info("Returning an empty session")
