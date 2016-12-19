@@ -1,5 +1,7 @@
 *.pyc
 *.swp
+tags
 *.png
 status.txt
 tomato.db
+monitor_path

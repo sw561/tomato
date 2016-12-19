@@ -3,6 +3,7 @@
 
 from datetime import datetime, timedelta
 from subprocess import check_output
+import logging
 from os import stat
 
 class BadCommand(Exception):
@@ -14,6 +15,7 @@ def get_last_modification_time(folder):
 	try:
 		newest_file = check_output(command, shell=True).strip()
 	except:
+		logging.info("Command is: %s" % command)
 		raise BadCommand
 	s = stat("%s/%s" % (folder,newest_file))
 	d = datetime.fromtimestamp(s.st_mtime)

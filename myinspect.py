@@ -15,7 +15,7 @@ logging.basicConfig(
 	datefmt="%-H:%M:%S"
 )
 
-day, week, log_folder = unshelve()
+day, week = unshelve()
 session = day.get_session()
 save_required = False
 
@@ -38,7 +38,7 @@ def new_session():
 	show(changed=True)
 
 def save():
-	reshelve(day, week, log_folder)
+	reshelve(day, week)
 	write_data(session)
 	global save_required
 	save_required = False
