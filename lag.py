@@ -11,7 +11,9 @@ class BadCommand(Exception):
 
 def get_last_modification_time(folder):
 	""" Get time of last file modification in the given folder """
-	command = "cd %s && ls -tr | tail -n 1" % folder
+	command = "cd %s && " % folder
+	command += "find . -maxdepth 1 -not -type d -and -not -name '.*'"
+	command += " | xargs ls -tr | tail -n 1"
 	try:
 		newest_file = check_output(command, shell=True).strip()
 	except:
