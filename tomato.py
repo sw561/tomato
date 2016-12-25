@@ -91,9 +91,9 @@ def max_lag():
 def tmux_format_monitor(log_status, log_name):
 	message = log_name
 	if log_status:
-		fg = "colour4"
+		fg = "black"
 		bg = "white"
-		reverse = "reverse"
+		reverse = "noreverse"
 		message += "  "
 	else:
 		message += " |"
