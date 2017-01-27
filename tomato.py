@@ -55,25 +55,29 @@ def tmux_format(working, x):
 	"""
 	if working and x.days>=0:
 		message = "KW"
+		r = "reverse"
 		fg = "colour4"
 		bg = "white"
 
 	elif working and x.days<0:
 		message = "HB"
-		fg = "colour11"
-		bg = "black"
+		r = "noreverse"
+		fg = "black"
+		bg = "yellow"
 
 	elif not working and x.days>=0:
 		message = "EB"
-		fg = "colour10"
-		bg = "black"
+		r = "noreverse"
+		fg = "black"
+		bg = "green"
 
 	elif not working and x.days<0:
 		message = "GW"
+		r = "reverse"
 		fg = "colour1"
 		bg = "white"
 
-	s = "#[reverse,fg=%s,bg=%s]  %s" % (fg, bg, message)
+	s = "#[%s,fg=%s,bg=%s]  %s" % (r, fg, bg, message)
 
 	if x.days>=0:
 		n = x.seconds/60+1
@@ -96,7 +100,7 @@ def tmux_format_monitor(log_status, log_name):
 		reverse = "noreverse"
 		message += "  "
 	else:
-		message += " |"
+		message += "  |"
 		fg = "white"
 		bg = "default"
 		reverse = "noreverse"
