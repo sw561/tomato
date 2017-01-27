@@ -22,7 +22,7 @@ class Week(object):
 		slot = workday.date.weekday()
 		self.days[slot] = workday
 		logging.info("Adding workday from %d/%d in slot %d" \
-			% (workday.date.month, workday.date.day, slot)
+			% (workday.date.day, workday.date.month, slot)
 			)
 
 	def clean(self):
