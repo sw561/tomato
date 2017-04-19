@@ -5,6 +5,7 @@ import logging
 import shelve
 from datetime import *
 from time import sleep
+import os
 from session import *
 from plotter import *
 from tomato import tmux_format, tmux_format_monitor,\
@@ -138,6 +139,9 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 	group.add_argument("-t", "--toggle", action="store_true",
 	                   help="Toggle the working status of the app"
 	                   )
+	group.add_argument("-q", "--quiet", action="store_true",
+	                   help="Stop reporting tomato time"
+	                   )
 	group.add_argument("-r", "--report", action="store_true",
 	                   help="Create plot which reports on recent work patterns"
 	                   )
@@ -164,6 +168,9 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 
 	elif args.toggle:
 		toggle()
+
+	elif args.quiet:
+		os.remove(data_file_path())
 
 	elif args.report:
 		day,week = unshelve()

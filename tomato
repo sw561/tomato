@@ -5,6 +5,9 @@
 if [ "$1" = 't' -o "$1" = "-t" ]; then
 	~/tomato/main.py --toggle
 	tmux refresh-client -S
+elif [ "$1" = 'q' -o "$1" = "-q" ]; then
+	~/tomato/main.py --quiet
+	tmux refresh-client -S
 elif [ "$1" = 'p' -o "$1" = "-p" ]; then
 	~/tomato/main.py --report
 	gnome-open ~/tomato/report.png
