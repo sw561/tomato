@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
-import shelve
 import logging
 from main import unshelve,reshelve,write_data
-from datetime import *
+from datetime import datetime
 import os
 from renumber import renumber
 from tomato import plan_path,data_file_path

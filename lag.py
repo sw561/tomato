@@ -1,7 +1,7 @@
 # A module to find the amount of time since the last
 # file modification in folder passed as a command line argument
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from subprocess import check_output
 import logging
 from os import stat

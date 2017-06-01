@@ -56,6 +56,7 @@ def plot(day, week):
 	plt.xticks(arange(0.5, 7),
 		[i.date.strftime("%a") if i is not None else "" for i in week.days]
 		)
+	plt.tick_params(top='off',bottom='off')
 	plt.ylabel("Hours")
 
 	# Need to convert total time to hours (may be over one day)

@@ -3,11 +3,11 @@
 import argparse
 import logging
 import shelve
-from datetime import *
+from datetime import datetime, timedelta
 from time import sleep
 import os
-from session import *
-from plotter import *
+from session import Day, Week, WorkDay
+from plotter import plot
 from tomato import tmux_format, tmux_format_monitor,\
 	data_file_path, shelf_path, max_lag, monitor_file_path
 import lag

@@ -1,4 +1,4 @@
-from datetime import *
+from datetime import datetime, timedelta
 from tomato import tomato, potato, max_work
 import logging
 from yesno import yes_no_question
@@ -144,10 +144,8 @@ class Session(object):
 		work_s = self.work_time().seconds
 		break_s = self.break_time().seconds
 		if self.status():
-			st = "ON"
 			remaining_time_s = tomato(work_s, break_s)
 		else:
-			st = "OFF"
 			remaining_time_s = potato(work_s, break_s)
 
 		imp_time = datetime.now() + timedelta(0, remaining_time_s)
@@ -166,7 +164,10 @@ class Session(object):
 			logging.info("Tomato was found to be %d mins" % (t/60))
 			s = t > max_work()
 
-		logging.info("Session staleness was found to be %d" % s)
+		if s:
+			logging.info("Session was found to be stale")
+		else:
+			logging.info("Session is not stale")
 		return s
 
 	def break_time(self):
