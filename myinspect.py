@@ -69,11 +69,11 @@ def help():
 def plan():
 	renumber(plan_path())
 	with open(plan_path(),"r") as f:
-		for line in f: print line.strip()
+		for line in f: print line.rstrip()
 	print "\nTo edit the plan use edit_plan()"
 
 def edit_plan():
-	os.system("vim %s" % plan_path())
+	os.system('vim {} -c "set et"'.format(plan_path()))
 	plan()
 
 print ""
