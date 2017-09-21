@@ -5,6 +5,7 @@ def renumber(name):
 	Redo the numbering on a list stored in the file name
 	"""
 	# Load the items in to memory as tuples (n,item)
+	deleting = False
 	items = []
 	with open(name,"r") as f:
 		for line in f:
@@ -13,11 +14,15 @@ def renumber(name):
 			index_open = line.find('(')
 			index = line.find(')')
 			if index==-1 or 0 <= index_open < index:
-				# Line not numbered. Append to previous entry
-				if not items:
-					raise ValueError("First entry not numbered")
-				(a, b) = items[-1]
-				items[-1] = (a, "{}\n    {}".format(b, line.strip()))
+				# Line not numbered.
+				if deleting:
+					continue
+				# Append to previous entry
+				if items:
+					(a, b) = items[-1]
+					items[-1] = (a, "{}\n    {}".format(b, line.strip()))
+				else:
+					items.append((0., line.strip()))
 				continue
 
 			first_letter = index+1
@@ -25,8 +30,11 @@ def renumber(name):
 				first_letter += 1
 			a = line[:index].strip()
 			b = line[first_letter:].strip()
-			if a!="x" and b:
+			if a=="x":
+				deleting = True
+			else:
 				items.append((float(a),b))
+				deleting = False
 
 	items.sort(key=lambda x: x[0])
 
