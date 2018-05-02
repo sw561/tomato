@@ -3,68 +3,13 @@
 import argparse
 import logging
 import shelve
-from datetime import datetime, timedelta
-from time import sleep
+from datetime import datetime
 import os
 from session import Day, Week, WorkDay
 from plotter import plot
-from tomato import tmux_format, tmux_format_monitor,\
-	data_file_path, shelf_path, max_lag, monitor_file_path
-import lag
-
-def tmux_string():
-	s = ""
-	s += tomato_string()
-	s += log_string()
-	print s
-
-def tomato_string():
-	try:
-		with open(data_file_path(), "r") as f:
-			s = f.read().split()
-			(status, imp) = ("ON"==s[0]), datetime(*map(int, s[1:]))
-	except IOError:
-		logging.info("The data_file %s was not found" % data_file_path())
-		return ""
-
-	now = datetime.now()
-	x = imp-now
-	# Only print if the session is recent
-	logging.info("Status, x: %d %s" % (status, str(x)))
-	if status or x>timedelta(0, -60*60):
-		return tmux_format(status, x)
-	else:
-		logging.info("The session is old - not printing")
-		return ""
-
-def log_string():
-
-	# Work out if log files are being actively updated
-	try:
-		with open(monitor_file_path(), 'r') as f:
-			log_folder = f.read().strip()
-	except IOError:
-		logging.info("Could not open monitor_file_path: %s" % monitor_file_path())
-		return ""
-
-	logging.info("Checking log activity in folder %s" % log_folder)
-	try:
-		lag_time = lag.lag(log_folder)
-	except lag.BadCommand:
-		logging.info("Bad command, probably indicates folder is invalid path")
-		return ""
-
-	logging.info("Lag found to be %s" % str(lag_time))
-	max_time = max_lag()
-	logging.info("Max lag is %s" % str(max_time))
-	log_status = lag_time.total_seconds() < max_time
-	# Get log_name to put in tmux status line
-	if log_folder[-1]=="/":
-		log_name = log_folder.split("/")[-2]
-	else:
-		log_name = log_folder.split("/")[-1]
-	logging.info("Log name is %s" % log_name)
-	return tmux_format_monitor(log_status, log_name)
+from tomato import data_file_path, shelf_path, monitor_file_path
+from tmux import tmux_string
+from contextlib import contextmanager
 
 def write_data(session):
 	if not session.toggles:
@@ -106,24 +51,27 @@ def reshelve(day, week):
 	d["day"] = day
 	d.close()
 
-def use_shelf(g):
+@contextmanager
+def use_shelf():
 	# A decorator for functions that unshelve and reshelve
-	def f():
-		day,week = unshelve()
-		g(day, week)
-		reshelve(day, week)
-	return f
+	day, week = unshelve()
+	yield day, week
+	reshelve(day, week)
 
 def set_log_folder(log_folder):
+	if not os.path.isdir(log_folder) and log_folder!="0":
+		print "{} does not exist".format(log_folder)
+		return
 	with open(monitor_file_path(), 'w') as f:
+		print "Setting folder to monitor to be: %s" % args.monitor[0]
 		f.write(log_folder+"\n")
 
-@use_shelf
-def toggle(day, week):
-	session = day.get_session(interactive=False)
-	session.toggle()
-	session.log()
-	write_data(session)
+def toggle():
+	with use_shelf() as (day, week):
+		session = day.get_session(interactive=False)
+		session.toggle()
+		session.log()
+		write_data(session)
 
 if __name__=="__main__":
 	parser = argparse.ArgumentParser(
@@ -161,9 +109,6 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 		)
 
 	if args.tmux:
-		# Sleep a while, so the toggle operation has a chance to complete
-		if not args.verbose:
-			sleep(0.5)
 		tmux_string()
 
 	elif args.toggle:
@@ -177,7 +122,6 @@ Tomato is an implementation of a pomodoro app for the status bar in tmux
 		plot(day, week)
 
 	elif args.monitor is not None:
-		print "Setting folder to monitor to be: %s" % args.monitor[0]
 		set_log_folder(args.monitor[0])
 
 	else:

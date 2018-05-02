@@ -1,20 +1,14 @@
 #!/usr/bin/env bash
 
 # Use $# to get number of command line arguments.
-
-if [ "$1" = 't' -o "$1" = "-t" -o "$1" = "toggle" ]; then
-	~/tomato/main.py --toggle
-	tmux refresh-client -S
-elif [ "$1" = 'q' -o "$1" = "-q" -o "$1" = "quiet" ]; then
-	~/tomato/main.py --quiet
-	tmux refresh-client -S
-elif [ "$1" = 'r' -o "$1" = "-r" -o "$1" = "report" ]; then
-	~/tomato/main.py --report
-	gnome-open ~/tomato/report.png
-elif [ "$1" = 'm' -o "$1" = "-m" -o "$1" = "monitor" ]; then
-	~/tomato/main.py --monitor $2
-	tmux refresh-client -S
+if [ $# -gt 0 ]; then
+	~/tomato/main.py "$@"
 else
 	ipython -i ~/tomato/myinspect.py
-	tmux refresh-client -S
+fi
+
+if [ "$1" = "-r" -o "$1" = "report" ]; then
+	gnome-open ~/tomato/report.png
+else
+	sleep .5 && tmux refresh-client -S &
 fi

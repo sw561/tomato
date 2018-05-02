@@ -27,8 +27,9 @@ def toggle(hour=None, minute=0):
 		session.toggle(time)
 	show(changed=True)
 
-def remove(n):
-	session.toggles.pop(n)
+def remove(*args):
+	for n in sorted(args, reverse=True):
+		session.toggles.pop(n)
 	show(changed=True)
 
 def new_session():
