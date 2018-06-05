@@ -38,7 +38,7 @@ def lag(folder):
 	command = "expr $({}) - $({})".format(c1, c2)
 	info("Command is: %s" % command)
 	lag_time_seconds = check_output(command, shell=True).strip()
-	return lag_time_seconds
+	return int(lag_time_seconds)
 
 def log_string():
 	# Work out if log files are being actively updated
@@ -56,10 +56,16 @@ def log_string():
 	info("Checking log activity in folder %s" % log_folder)
 	try:
 		lag_time = lag(log_folder)
-	except CalledProcessError:
-		info("Bad command, probably indicates folder is invalid path")
-		return ""
+	except CalledProcessError as e:
+		if e.returncode == 1:
+			# The expr program gives an exit-status of 1 if the result of the
+			# expression is NULL or zero
+			lag_time = int(e.output)
+		else:
+			info("Bad command, probably indicates folder is invalid path")
+			return ""
 
+	info("Type of lag_time is %s" % type(lag_time))
 	info("Lag found to be %s" % str(lag_time))
 	max_time = max_lag()
 	info("Max lag is %s" % str(max_time))
@@ -70,6 +76,7 @@ def log_string():
 	else:
 		log_name = log_folder.split("/")[-1]
 	info("Log name is %s" % log_name)
+	info("Log status is %r" % log_status)
 	return tmux_format_monitor(log_status, log_name)
 
 if __name__=="__main__":
